@@ -92,6 +92,12 @@ async function handleCreateRace() {
 	renderAt('#race', renderRaceStartView(store.track_name))
 
 	// TODO - Get player_id and track_id from the store
+	const player_id = store.player_id;
+	if(!player_id) {
+		console.warn("No player selected")
+	}
+	const track_id = store.track_id;
+	if(!track_id)
 	
 	// const race = TODO - call the asynchronous method createRace, passing the correct parameters
 
