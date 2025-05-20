@@ -102,14 +102,17 @@ async function handleCreateRace() {
 	}
 
 	// const race = TODO - call the asynchronous method createRace, passing the correct parameters
-	const race = this.createRace(player_id, track_id);
-
-	// TODO - update the store with the race id in the response
-	store.race_id = 
-
+	//becasue async - try catch
+	try {
+		const race = this.createRace(player_id, track_id);
+		// TODO - update the store with the race id in the response
+		store.race_id = race.ID;
 	// TIP - console logging API responses can be really helpful to know what data shape you received
 	console.log("RACE: ", race)
-	// store.race_id = 
+	} catch (error) {
+		console.log("Problem with createRace request::", error)
+	}
+
 
 	// The race has been created, now start the countdown
 	// TODO - call the async function runCountdown
@@ -124,7 +127,7 @@ function runRace(raceID) {
 	return new Promise(resolve => {
 		// TODO - use Javascript's built in setInterval method to get race info (getRace function) every 500ms
 
-		setInterval(() => {}, 500)
+		setInterval(() => { }, 500)
 
 
 		/* 
@@ -350,14 +353,13 @@ function defaultFetchOpts() {
 function getTracks() {
 	console.log(`calling server :: ${SERVER}/api/tracks`)
 	return fetch(`${SERVER}/api/tracks`, {
-		mehtod: 'GET',
+		method: 'GET',
 		...defaultFetchOpts(),
 		dataType: 'jsonp',
-		body: JSON.stringify([])
 	})
 		.then(res => res.json())
 		.catch(err => console.log("Problem with getTracks request::", err))
-	
+
 	// GET request to `${SERVER}/api/tracks`
 	// TODO: Fetch tracks
 	// TIP: Don't forget a catch statement!
@@ -368,7 +370,6 @@ function getRacers() {
 		method: 'GET',
 		...defaultFetchOpts(),
 		dataType: 'jsonp',
-		body: JSON.stringify([])
 	})
 		.then(res => res.json())
 		.catch(err => console.log("Problem with getRacers request::", err))
@@ -399,8 +400,8 @@ function getRace(id) {
 	})
 		.then(res => res.json())
 		.catch(err => console.log("Problem with getRace request::", err))
-	}
-	// GET request to `${SERVER}/api/races/${id}`
+}
+// GET request to `${SERVER}/api/races/${id}`
 
 function startRace(id) {
 	return fetch(`${SERVER}/api/races/${id}/start`, {
