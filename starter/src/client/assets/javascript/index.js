@@ -253,7 +253,7 @@ function handleAccelerate() {
 // Provided code - do not remove
 
 function renderRacerCars(racers) {
-	if (!racers.length) {
+	if (racers.length === 0) {
 		return `
 			<h4>Loading Racers...</4>
 		`
@@ -276,7 +276,7 @@ function renderRacerCard(racer) {
 }
 
 function renderTrackCards(tracks) {
-	if (!tracks.length) {
+	if (tracks.length === 0) {
 		return `
 			<h4>Loading Tracks...</4>
 		`
@@ -410,7 +410,7 @@ function getTracks() {
 		dataType: 'jsonp',
 	})
 		.then(res => res.json())
-		.catch(err => console.log("Problem with getTracks request::", err))
+		.catch(err => console.log("Problem with getTracks request:", err))
 }
 
 function getRacers() {
@@ -420,7 +420,7 @@ function getRacers() {
 		dataType: 'jsonp',
 	})
 		.then(res => res.json())
-		.catch(err => console.log("Problem with getRacers request::", err))
+		.catch(err => console.log("Problem with getRacers request:", err))
 	// GET request to `${SERVER}/api/cars`
 	// TODO: Fetch racers
 	// TIP: Do a file search for "TODO" to make sure you find all the things you need to do! There are even some vscode plugins that will highlight todos for you
@@ -438,7 +438,7 @@ function createRace(player_id, track_id) {
 		body: JSON.stringify(body)
 	})
 		.then(res => res.json())
-		.catch(err => console.log("Problem with createRace request::", err))
+		.catch(err => console.log("Problem with createRace request:", err))
 }
 
 function getRace(id) {
@@ -447,7 +447,7 @@ function getRace(id) {
 		...defaultFetchOpts(),
 	})
 		.then(res => res.json())
-		.catch(err => console.log("Problem with getRace request::", err))
+		.catch(err => console.log("Problem with getRace request:", err))
 }
 // GET request to `${SERVER}/api/races/${id}`
 
@@ -457,7 +457,7 @@ function startRace(id) {
 		...defaultFetchOpts(),
 	})
 		.then(res => res.json())
-		.catch(err => console.log("Problem with getRace request::", err))
+		.catch(err => console.log("Problem with getRace request:", err))
 }
 
 // POST request to `${SERVER}/api/races/${id}/accelerate`
@@ -469,6 +469,6 @@ function accelerate(id) {
 		...defaultFetchOpts(),
 	})
 		.then(res => res.json())
-		.catch(err => console.log("Problem with accelerate request::", err))
+		.catch(err => console.log("Problem with accelerate request:", err))
 
 }
