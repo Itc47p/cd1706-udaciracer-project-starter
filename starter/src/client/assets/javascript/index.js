@@ -187,31 +187,27 @@ function runRace(raceID) {
 
 async function runCountdown() {
 	try {
-		// wait for the DOM to load
-		await delay(1000)
-		let timer = 3
-
+		// Wait for the DOM to load
+		await delay(1000);
+		let timer = 3;
+		
 		return new Promise(resolve => {
-			// TODO - use Javascript's built in setInterval method to count down once per second
+			// Use setInterval to count down every second
+			// run this DOM manipulation inside the set interval to decrement the countdown for the user
 			const countdown = setInterval(() => {
-				if (timer < 1) {
-					clearInterval(countdown)
-					resolve()
+				// Update the countdown HTML with the current number
+				document.getElementById('big-numbers').innerHTML = renderCountdown(timer);
+
+				// clear the interval at 0 and resolve the promise
+				if (timer === 0) {
+					clearInterval(countdown);
+					resolve();
 				}
-			}, 1000)
-			// TODO - if the countdown is 0, clear the interval, resolve the promise, and return
-			// TODO - if the countdown is 3, 2, or 1, update the countdown HTML with the correct number
 
-			this.renderAt('#big-numbers', renderCountdown(timer))
-			document.getElementById('big-numbers').innerHTML = --timer
-			// TODO - when the setInterval timer hits 0, clear the interval, resolve the promise, and return
-			if (timer > 1) {
-				clearInterval(countdown)
-				resolve()
-				return this.Promise.resolve()
-			}
-
-		})
+				// Decrement the timer
+				timer--;
+			}, 1000);
+		});
 	} catch (error) {
 		console.log(error);
 	}
@@ -285,19 +281,20 @@ function renderRacerCard(racer) {
 }
 
 function renderTrackCards(tracks) {
-	if (tracks.length === 0) {
-		return `
-			<h4>Loading Tracks...</4>
-		`
+    if (!Array.isArray(tracks)) {
+        console.error("Invalid tracks data:", tracks);
+        return `<h4>Error loading tracks</h4>`;
+    }
+
+    if (tracks.length === 0) {
+        return `<h4>Loading Tracks...</h4>`;
+    }
+	if (tracks === undefined) {
+		console.warn("Tracks is undefined, returning empty list");
 	}
 
-	const results = tracks.map(renderTrackCard).join('')
-
-	return `
-		<ul id="tracks">
-			${results}
-		</ul>
-	`
+    const results = tracks.map(renderTrackCard).join('');
+    return `<ul id="tracks">${results}</ul>`;
 }
 
 function renderTrackCard(track) {
@@ -413,20 +410,21 @@ function defaultFetchOpts() {
 // TIP: Don't forget a catch statement!
 async function getTracks() {
 	try {
-		return fetch(`${SERVER}/api/tracks`, {
+		const response = await fetch(`${SERVER}/api/tracks`, {
 			method: 'GET',
 			...defaultFetchOpts(),
-			dataType: 'jsonp',
-		})
-			
-	}catch (err) {
-		console.log("Problem with getTracks request:", err)
-		console.log(`calling server :: ${SERVER}/api/tracks`)
+		});
+		const data = await response.json(); // Parse the response into JSON
+		return data; // Return the parsed data
+	} catch (err) {
+		console.log("Problem with getTracks request:", err);
+		console.log(`calling server :: ${SERVER}/api/tracks`);
+		return []; // Return an empty array to prevent further errors
 	}
 }
 
 async function getRacers() {
-	try{
+	try {
 		const response = await fetch(`${SERVER}/api/cars`, {
 			method: 'GET',
 			...defaultFetchOpts(),
@@ -460,7 +458,7 @@ async function createRace(player_id, track_id) {
 }
 
 async function getRace(id) {
-	try{
+	try {
 		const response = await fetch(`${SERVER}/api/${id}`, {
 			method: 'GET',
 			...defaultFetchOpts(),
