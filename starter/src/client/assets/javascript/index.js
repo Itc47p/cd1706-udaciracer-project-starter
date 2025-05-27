@@ -158,13 +158,13 @@ function runRace(raceID) {
 	
 			renderAt('#leaderBoard', raceProgress(res.positions))
 		*/
-			/* 
-			TODO - if the race info status property is "finished", run the following:
+		/* 
+		TODO - if the race info status property is "finished", run the following:
 	
-			clearInterval(raceInterval) // to stop the interval from repeating
-			renderAt('#race', resultsView(res.positions)) // to render the results view
-			resolve(res) // resolve the promise
-		*/
+		clearInterval(raceInterval) // to stop the interval from repeating
+		renderAt('#race', resultsView(res.positions)) // to render the results view
+		resolve(res) // resolve the promise
+	*/
 
 		if (raceID) {
 			getRace(raceID)
@@ -205,7 +205,7 @@ async function runCountdown() {
 			this.renderAt('#big-numbers', renderCountdown(timer))
 			document.getElementById('big-numbers').innerHTML = --timer
 			// TODO - when the setInterval timer hits 0, clear the interval, resolve the promise, and return
-			if (timer > 1){
+			if (timer > 1) {
 				clearInterval(countdown)
 				resolve()
 				return this.Promise.resolve()
@@ -244,9 +244,18 @@ function handleSelectTrack(target) {
 }
 
 function handleAccelerate() {
-	console.log("accelerate button clicked")
-	// TODO - Invoke the API call to accelerate
-	this.accelerate();
+	console.log("Accelerate button clicked for race ID:", store.race_id);
+	// Invoke the API call to accelerate
+	try {
+		accelerate(store.race_id)
+		if (!store.race_id) {
+			console.warn('NO ID FOUND')
+			return;
+		}
+	} catch (error) {
+		console.log("Problem with accelerate request:", error);
+	}
+
 }
 
 // HTML VIEWS ------------------------------------------------
@@ -402,73 +411,91 @@ function defaultFetchOpts() {
 // GET request to `${SERVER}/api/tracks`
 // TODO: Fetch tracks
 // TIP: Don't forget a catch statement!
-function getTracks() {
-	console.log(`calling server :: ${SERVER}/api/tracks`)
-	return fetch(`${SERVER}/api/tracks`, {
-		method: 'GET',
-		...defaultFetchOpts(),
-		dataType: 'jsonp',
-	})
-		.then(res => res.json())
-		.catch(err => console.log("Problem with getTracks request:", err))
+async function getTracks() {
+	try {
+		return fetch(`${SERVER}/api/tracks`, {
+			method: 'GET',
+			...defaultFetchOpts(),
+			dataType: 'jsonp',
+		})
+			
+	}catch (err) {
+		console.log("Problem with getTracks request:", err)
+		console.log(`calling server :: ${SERVER}/api/tracks`)
+	}
 }
 
-function getRacers() {
-	return fetch(`${SERVER}/api/cars`, {
-		method: 'GET',
-		...defaultFetchOpts(),
-		dataType: 'jsonp',
-	})
-		.then(res => res.json())
-		.catch(err => console.log("Problem with getRacers request:", err))
+async function getRacers() {
+	try{
+		const response = await fetch(`${SERVER}/api/cars`, {
+			method: 'GET',
+			...defaultFetchOpts(),
+		});
+		return await response.json();
+	} catch (err) {
+		console.log("Problem with getRacers request:", err);
+		return;
+	}
 	// GET request to `${SERVER}/api/cars`
 	// TODO: Fetch racers
 	// TIP: Do a file search for "TODO" to make sure you find all the things you need to do! There are even some vscode plugins that will highlight todos for you
 }
 
-function createRace(player_id, track_id) {
+async function createRace(player_id, track_id) {
 	player_id = parseInt(player_id)
 	track_id = parseInt(track_id)
 	const body = { player_id, track_id }
 
-	return fetch(`${SERVER}/api/races`, {
-		method: 'POST',
-		...defaultFetchOpts(),
-		dataType: 'jsonp',
-		body: JSON.stringify(body)
-	})
-		.then(res => res.json())
-		.catch(err => console.log("Problem with createRace request:", err))
+	try {
+		const response = await fetch(`${SERVER}/api/races`, {
+			method: 'POST',
+			...defaultFetchOpts(),
+			body: JSON.stringify(body),
+		});
+		return await response.json();
+	} catch (err) {
+		console.log("Problem with createRace request:", err);
+		return;
+	}
 }
 
-function getRace(id) {
-	return fetch(`${SERVER}/api/races/${id}`, {
-		method: 'GET',
-		...defaultFetchOpts(),
-	})
-		.then(res => res.json())
-		.catch(err => console.log("Problem with getRace request:", err))
+async function getRace(id) {
+	try{
+		const response = await fetch(`${SERVER}/api/${id}`, {
+			method: 'GET',
+			...defaultFetchOpts(),
+		});
+		return await response.json();
+	} catch (err) {
+		console.log("Problem with getRace request:", err);
+	}
 }
+
 // GET request to `${SERVER}/api/races/${id}`
 
-function startRace(id) {
-	return fetch(`${SERVER}/api/races/${id}/start`, {
-		method: 'POST',
-		...defaultFetchOpts(),
-	})
-		.then(res => res.json())
-		.catch(err => console.log("Problem with getRace request:", err))
+async function startRace(id) {
+	try {
+		const response = await fetch(`${SERVER}/api/races/${id}/start`, {
+			method: 'POST',
+			...defaultFetchOpts(),
+		});
+		return await response.json();
+	} catch (err) {
+		console.log("Problem with startRace request:", err);
+	}
 }
 
 // POST request to `${SERVER}/api/races/${id}/accelerate`
 // options parameter provided as defaultFetchOpts
 // no body or datatype needed for this request
-function accelerate(id) {
-	return fetch(`${SERVER}/api/races/${id}/accelerate`, {
-		method: 'POST',
-		...defaultFetchOpts(),
-	})
-		.then(res => res.json())
-		.catch(err => console.log("Problem with accelerate request:", err))
-
+async function accelerate(id) {
+	try {
+		const response = await fetch(`${SERVER}/api/races/${id}/accelerate`, {
+			method: 'POST',
+			...defaultFetchOpts(),
+		});
+		return await response.json();
+	} catch (err) {
+		console.log("Problem with accelerate request:", err);
+	}
 }
