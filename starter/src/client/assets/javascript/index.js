@@ -258,9 +258,9 @@ function renderRacerCard(racer) {
 	// OPTIONAL: There is more data given about the race cars than we use in the game, if you want to factor in top speed, acceleration, 
 	// and handling to the various vehicles, it is already provided by the API!
 	return `<h4 class="card racer" id="${id}">${driver_name}</h4>
-				<p>Top Speed: ${top_speed}</p>
-				<p>Acceleration: ${acceleration}</p>
-				<p>Handling: ${handling}</p>	
+				<small>Top Speed: ${top_speed}</small>
+				<small>Acceleration: ${acceleration}</small>
+				<small>Handling: ${handling}</small>	
 		`
 }
 
