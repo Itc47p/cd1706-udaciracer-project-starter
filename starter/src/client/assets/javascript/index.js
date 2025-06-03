@@ -86,44 +86,44 @@ async function delay(ms) {
 
 // This async function controls the flow of the race, add the logic and error handling
 async function handleCreateRace() {
-    // Render starting UI
-    renderAt('#race', renderRaceStartView(store.track_name));
+	// Render starting UI
+	renderAt('#race', renderRaceStartView(store.track_name));
 
-    // Get player_id and track_id from the store
-    const player_id = store.player_id;
-    const track_id = store.track_id;
+	// Get player_id and track_id from the store
+	const player_id = store.player_id;
+	const track_id = store.track_id;
 
-    if (!player_id || !track_id) {
-        console.error("Player or track not selected. Please select both to proceed.");
-        return;
-    }
+	if (!player_id || !track_id) {
+		console.error("Player or track not selected. Please select both to proceed.");
+		return;
+	}
 
-    try {
-        // Call the asynchronous method to create a race
-        const race = await createRace(player_id, track_id);
+	try {
+		// Call the asynchronous method to create a race
+		const race = await createRace(player_id, track_id);
 
-        // Debugging: Log the race object
-        // console.log("Race object returned from createRace:", race);
+		// Debugging: Log the race object
+		// console.log("Race object returned from createRace:", race);
 
-        // Update the store with the race ID from the response
-        if (race && race.id) {
-            store.race_id = race.id;
-            console.log("Race created with ID:", store.race_id);
-        } else {
-            console.error("Failed to update store with race ID. Race response:", race);
-        }
+		// Update the store with the race ID from the response
+		if (race && race.id) {
+			updateStoreValue('race_id', race.id);
+			console.log("Race created with ID:", store.race_id);
+		} else {
+			console.error("Failed to update store with race ID. Race response:", race);
+		}
 
-        // Start the countdown
-        await runCountdown();
+		// Start the countdown
+		await runCountdown();
 
-        // Start the race
-        await startRace(store.race_id);
+		// Start the race
+		await startRace(store.race_id);
 
-        // Run the race
-        await runRace(store.race_id);
-    } catch (error) {
-        console.error("Error in handleCreateRace:", error);
-    }
+		// Run the race
+		await runRace(store.race_id);
+	} catch (error) {
+		console.error("Error in handleCreateRace:", error);
+	}
 }
 
 function runRace(raceID) {
@@ -258,9 +258,11 @@ function renderRacerCard(racer) {
 	// OPTIONAL: There is more data given about the race cars than we use in the game, if you want to factor in top speed, acceleration, 
 	// and handling to the various vehicles, it is already provided by the API!
 	return `<h4 class="card racer" id="${id}">${driver_name}</h4>
-				<small>Top Speed: ${top_speed}</small>
-				<small>Acceleration: ${acceleration}</small>
-				<small>Handling: ${handling}</small>	
+				<div>
+				<strong>Top Speed</strong>: ${top_speed}
+				<strong>Acceleration</strong>: ${acceleration}
+				<strong>Handling</strong>: ${handling}
+				</div>	
 		`
 }
 
@@ -288,21 +290,21 @@ function renderTrackCard(track) {
 }
 
 function renderCountdown(count) {
-	if (count === 0) {
-		return `
-			<h2>Race in progress!</h2>
-		`;
-	}
+	// if (count === 0) {
+	// 	return `<h2>Race in progress!</h2>`;
+	// }
+
 	return `
-		<h2>Race Starts In...</h2>
-		<p id="big-numbers">${count}</p>
+		<h2>${count !== 0 ? "Get Ready!" : ""}</h2>
+		<p id="big-numbers">${count !== 0 ? `Race Starts In...${count}` : count}</p>
 	`;
 }
 
 function renderRaceStartView(track) {
+	console.log('TRACK NAME', track)
 	return `
 		<header>
-			<h1>Race: ${track.name}</h1>
+			<h1>Race: ${track}</h1>
 		</header>
 		<main id="two-columns">
 			<section id="leaderBoard">
@@ -426,11 +428,9 @@ async function getRacers() {
 		});
 		return await response.json();
 	} catch (err) {
-		console.log("Problem with getRacers request:", err);
-		return;
+		console.error("Problem with getRacers request:", err);
+		return [];
 	}
-	// GET request to `${SERVER}/api/cars`
-	// TODO: Fetch racers
 }
 
 async function createRace(player_id, track_id) {
@@ -446,13 +446,9 @@ async function createRace(player_id, track_id) {
         });
         const race = await response.json();
 
-        // Debugging: Log the response
-        // console.log("createRace response:", race);
-		// console.log("createRace request body:", body);
-
         // Update race_id in the store
-        if (race && race.ID) {
-            store.race_id = race.ID; // Update the store
+        if (race && race.id) {
+            store.race_id = race.id; // Update the store
             console.log("Updated store with race ID:", store.race_id);
         } else {
             console.error("Race ID not found in response:", race);
@@ -466,16 +462,16 @@ async function createRace(player_id, track_id) {
 }
 
 async function getRace(id) {
-    try {
-        const response = await fetch(`${SERVER}/api/races/${id}`, {
-            method: 'GET',
-            ...defaultFetchOpts(),
-        });
-        const race = await response.json();
-        return race;
-    } catch (err) {
-        console.log("Problem with getRace request:", err);
-    }
+	try {
+		const response = await fetch(`${SERVER}/api/races/${id}`, {
+			method: 'GET',
+			...defaultFetchOpts(),
+		});
+		const race = await response.json();
+		return race;
+	} catch (err) {
+		console.log("Problem with getRace request:", err);
+	}
 }
 
 // GET request to `${SERVER}/api/races/${id}`
